@@ -11,16 +11,33 @@ fetch(booksURL)
 })
 
 function renderBookList(book) {
-  let title = book.title
-  let description = book.description 
-  let cover = book.img_url
-  let users = book.users
-
   let listItem = document.createElement("li")
-  listItem.innerText = title
+  listItem.innerText = book.title
   bookList.append(listItem)
 
   listItem.addEventListener("click", (event) => {
-    
+    bookInfo.innerHTML = ""
+    showBookInfo(book, event)
   })
+}
+
+function showBookInfo(book, event) {
+  let title = document.createElement("h2")
+  title.innerText = book.title
+
+  let cover = document.createElement("img")
+  cover.src = book.img_url
+
+  let description = document.createElement("p")
+  description.innerText = book.description
+
+  let userList = document.createElement("ul")
+
+  book.users.forEach((user) => {
+    let userListItem = document.createElement("li")
+    userListItem.innerText = user.username
+    userList.append(userListItem)
+  })
+
+  bookInfo.append(title, cover, description, userList)
 }
