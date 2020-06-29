@@ -1,6 +1,8 @@
 const booksURL = `http://localhost:3000/books`
+const usersURL = `http://localhost:3000/users`
 const bookList = document.querySelector("#list")
 const bookInfo = document.querySelector("#show-panel")
+let usersArr = []
 
 fetch(booksURL)
 .then(r => r.json())
@@ -10,18 +12,24 @@ fetch(booksURL)
   })
 })
 
+fetch(usersURL)
+.then(r => r.json())
+.then((users) => {
+  usersArr = users
+})
+
 function renderBookList(book) {
   let listItem = document.createElement("li")
   listItem.innerText = book.title
   bookList.append(listItem)
 
-  listItem.addEventListener("click", (event) => {
+  listItem.addEventListener("click", () => {
     bookInfo.innerHTML = ""
-    showBookInfo(book, event)
+    showBookInfo(book)
   })
 }
 
-function showBookInfo(book, event) {
+function showBookInfo(book) {
   let title = document.createElement("h2")
   title.innerText = book.title
 
@@ -31,7 +39,13 @@ function showBookInfo(book, event) {
   let description = document.createElement("p")
   description.innerText = book.description
 
+  let userListTitle = document.createElement("h3")
+  userListTitle.innerText = "Likes"
   let userList = document.createElement("ul")
+
+  let likeButton = document.createElement("button")
+  likeButton.innerText = "<3 Like"
+  likeButton.id = "like-button"
 
   book.users.forEach((user) => {
     let userListItem = document.createElement("li")
@@ -39,5 +53,28 @@ function showBookInfo(book, event) {
     userList.append(userListItem)
   })
 
-  bookInfo.append(title, cover, description, userList)
+  bookInfo.append(title, cover, description, userListTitle, userList, likeButton)
+
+  likeBook(book)
+}
+
+function likeBook(book) {
+  let likeButton = document.querySelector("#like-button")
+  let newUser = usersArr[0]
+
+  likeButton.addEventListener("click", (event) => {
+    fetch(`http://localhost:3000/books/${book.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: {
+        users: [...book.users, newUser]
+      }
+    })
+    .then(r => r.json())
+    .then((updatedBook) => {
+      console.log(updatedBook)
+    })
+  })
 }
