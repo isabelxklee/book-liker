@@ -49,13 +49,12 @@ function showBookInfo(book) {
   likeButton.innerText = "<3 Like"
   likeButton.id = "like-button"
 
-  if (book.users.length > 0) {
-    book.users.forEach((user) => {
-      let userListItem = document.createElement("li")
-      userListItem.innerText = user.username
-      userList.append(userListItem)
-    })
-  }
+  book.users.forEach((user) => {
+    let userListItem = document.createElement("li")
+    userListItem.innerText = user.username
+    userListItem.id = user.username
+    userList.append(userListItem)
+  })
 
   bookInfo.append(title, cover, description, userListTitle, userList, likeButton)
 
@@ -70,11 +69,9 @@ function likeBook(book) {
   likeButton.addEventListener("click", () => {
     let existingUser = false 
 
-    if (book.users.length > 0) {
-      book.users.forEach((user) => {
-        user.id === 1 ? existingUser = true : null
-      })
-    }
+    book.users.forEach((user) => {
+      user.id === 1 ? existingUser = true : null
+    })
     
     if (existingUser === false) {
       fetch(`http://localhost:3000/books/${book.id}`, {
@@ -104,7 +101,7 @@ function likeBook(book) {
       .then(r => r.json())
       .then((updatedBook) => {
         console.log(updatedBook)
-        // removeUser(newUser)
+        removeUser(newUser)
       })
     }
   })
@@ -113,15 +110,14 @@ function likeBook(book) {
 function addUser(newUser) {
   let userListItem = document.createElement("li")
   userListItem.innerText = newUser.username
+  userListItem.id = newUser.username
 
   let userList = document.querySelector("#user-list")
   userList.append(userListItem)
 }
 
-function removeUser() {
-  let userListItem = document.createElement("li")
-  userListItem.innerText = newUser.username
-
+function removeUser(newUser) {
   let userList = document.querySelector("#user-list")
-  userList.append(userListItem)
+  let removedUser = document.querySelector(`li#${newUser.username}`)
+  userList.removeChild(removedUser)
 }
