@@ -49,11 +49,13 @@ function showBookInfo(book) {
   likeButton.innerText = "<3 Like"
   likeButton.id = "like-button"
 
-  book.users.forEach((user) => {
-    let userListItem = document.createElement("li")
-    userListItem.innerText = user.username
-    userList.append(userListItem)
-  })
+  if (book.users.length > 0) {
+    book.users.forEach((user) => {
+      let userListItem = document.createElement("li")
+      userListItem.innerText = user.username
+      userList.append(userListItem)
+    })
+  }
 
   bookInfo.append(title, cover, description, userListTitle, userList, likeButton)
 
@@ -63,26 +65,63 @@ function showBookInfo(book) {
 function likeBook(book) {
   let likeButton = document.querySelector("#like-button")
   let newUser = usersArr[0]
+  let updatedList = [...book.users, newUser]
 
-  likeButton.addEventListener("click", (event) => {
-    fetch(`http://localhost:3000/books/${book.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        users: [...book.users, newUser]
+  likeButton.addEventListener("click", () => {
+    let existingUser = false 
+
+    if (book.users.length > 0) {
+      book.users.forEach((user) => {
+        user.id === 1 ? existingUser = true : null
       })
-    })
-    .then(r => r.json())
-    .then((updatedBook) => {
-      console.log(updatedBook)
-      book.users = [...book.users, newUser]
-      let userListItem = document.createElement("li")
-      userListItem.innerText = newUser.username
-
-      let userList = document.querySelector("#user-list")
-      userList.append(userListItem)
-    })
+    }
+    
+    if (existingUser === false) {
+      fetch(`http://localhost:3000/books/${book.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          users: updatedList
+        })
+      })
+      .then(r => r.json())
+      .then((updatedBook) => {
+        console.log(updatedBook)
+        addUser(newUser)
+      })
+    } else {
+      fetch(`http://localhost:3000/books/${book.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          users: book.users.pop()
+        })
+      })
+      .then(r => r.json())
+      .then((updatedBook) => {
+        console.log(updatedBook)
+        // removeUser(newUser)
+      })
+    }
   })
+}
+
+function addUser(newUser) {
+  let userListItem = document.createElement("li")
+  userListItem.innerText = newUser.username
+
+  let userList = document.querySelector("#user-list")
+  userList.append(userListItem)
+}
+
+function removeUser() {
+  let userListItem = document.createElement("li")
+  userListItem.innerText = newUser.username
+
+  let userList = document.querySelector("#user-list")
+  userList.append(userListItem)
 }
