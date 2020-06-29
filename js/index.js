@@ -41,7 +41,9 @@ function showBookInfo(book) {
 
   let userListTitle = document.createElement("h3")
   userListTitle.innerText = "Likes"
+
   let userList = document.createElement("ul")
+  userList.id = "user-list"
 
   let likeButton = document.createElement("button")
   likeButton.innerText = "<3 Like"
@@ -68,13 +70,19 @@ function likeBook(book) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: {
+      body: JSON.stringify({
         users: [...book.users, newUser]
-      }
+      })
     })
     .then(r => r.json())
     .then((updatedBook) => {
       console.log(updatedBook)
+      book.users = [...book.users, newUser]
+      let userListItem = document.createElement("li")
+      userListItem.innerText = newUser.username
+
+      let userList = document.querySelector("#user-list")
+      userList.append(userListItem)
     })
   })
 }
